@@ -204,4 +204,14 @@ public class AVLTree<T> extends BinTree<T> {
         initAllHeight();
         return res;
     }
+
+    @Override
+    public AVLTree<T> copy() {
+       AVLTree avlTree = new AVLTree<>(comparator);
+       BinTree binCopy = super.copy();
+       avlTree.root = binCopy.root;
+       avlTree.size = binCopy.size;
+       avlTree.initAllHeight();
+       return avlTree;
+    }
 }

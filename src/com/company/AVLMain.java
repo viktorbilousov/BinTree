@@ -105,7 +105,6 @@ public class AVLMain {
         testRotR.fillFromArr(exampleRotRight, TreeTraversal.Inorder);
         test.fillFromArr(avlExample, TreeTraversal.Inorder);
 
-        test.print();
 
 
 
