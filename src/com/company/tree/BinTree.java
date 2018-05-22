@@ -86,6 +86,18 @@ public abstract class BinTree<T> implements iTree<T>{
             return root != null;
         }
 
+        public boolean removeChild(Node<T> child){
+            if(child == left) {
+                left = null;
+                return true;
+            }
+            else if (child == right){
+                right = null;
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public boolean equals(Object obj) {
             try {
@@ -260,7 +272,7 @@ public abstract class BinTree<T> implements iTree<T>{
     }
 
     @Override
-    final public void clean(){
+    public void clean(){
         root = null;
         size = 0;
     }
@@ -405,11 +417,12 @@ public abstract class BinTree<T> implements iTree<T>{
 
     //todo copy
     @Override
-    final public BinTree<T> copy() {
-        BinTree<T> copy = new SimpleTree<>(comparator);
+    public BinTree<T> copy() {
+        BinTree<T> copy = new SimpleBinTree<>(comparator);
         if(root == null) return copy;
         copy.root = new Node<>(root.getObject());
         recCopy(this.root, copy.root);
+        copy.size = this.size;
         return copy;
     }
     private void recCopy(Node<T> thisRoot, Node<T> copyRoot){
