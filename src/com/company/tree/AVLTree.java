@@ -5,12 +5,18 @@ import java.util.Comparator;
 public class AVLTree<T> extends BinTree<T> {
 
 
-    final private class AVLNode<T> extends Node<T> {
+    private class AVLNode<T> extends Node<T> {
 
         private int height;
 
-        public AVLNode(Node<T> node, int height){
+
+        public AVLNode(Node<T> node, int height) {
             super(node.getObject(), node.getLeft(), node.getRight(), node.getRoot());
+            this.height = height;
+        }
+
+        public AVLNode(T object, Node left, Node right, Node root, int height) {
+            super(object, left, right, root);
             this.height = height;
         }
 
@@ -24,17 +30,22 @@ public class AVLTree<T> extends BinTree<T> {
         }
 
         public void setHeight(int height) {
+            if (height < 0) height = 0;
             this.height = height;
         }
 
         @Override
         public String toString() {
-            return super.toString() + "="+ height;
+            return super.toString() + "=" + height;
         }
     }
 
     private int getHeight(Node<T> node) {
         return (node == null) ? -1 : ((AVLNode<T>) node).getHeight();
+    }
+
+    private void setHeight(Node<T> node, int height) {
+        ((AVLNode) node).setHeight(height);
     }
 
     public AVLTree(Comparator<T> comparator) {
@@ -45,17 +56,17 @@ public class AVLTree<T> extends BinTree<T> {
         ((AVLNode<T>) node).setHeight(super.depth(node));
     }
 
-    private void initAllHeight(){
+    private void initAllHeight() {
         root = recInitAllNode(root);
     }
 
-    private AVLNode<T> recInitAllNode(Node<T> node){
+    private AVLNode<T> recInitAllNode(Node<T> node) {
 
         AVLNode<T> avlNode = new AVLNode<>(node, depth(node));
-        if(avlNode.isHaveLeft()){
+        if (avlNode.isHaveLeft()) {
             avlNode.setLeft(recInitAllNode(avlNode.getLeft()));
         }
-        if(avlNode.isHaveRight()){
+        if (avlNode.isHaveRight()) {
             avlNode.setRight(recInitAllNode(avlNode.getRight()));
         }
         return avlNode;
@@ -64,7 +75,6 @@ public class AVLTree<T> extends BinTree<T> {
     private void rotateLeft(Node<T> node) {
         Node<T> right = node.getRight();
         Node<T> left = node.getLeft();
-
         T obj = node.getObject();
 
         node.setRight(right.getRight());
@@ -85,10 +95,12 @@ public class AVLTree<T> extends BinTree<T> {
         Node<T> left = node.getLeft();
         Node<T> right = node.getRight();
         T nodeObj = node.getObject();
+
         node.setLeft(left.getLeft());
         node.setRight(left);
         node.setObject(left.getObject());
-        ((AVLNode)node).setHeight(getHeight(left));
+
+        ((AVLNode) node).setHeight(getHeight(left));
         left.setLeft(left.getRight());
         left.setRight(right);
         left.setObject(nodeObj);
@@ -140,48 +152,122 @@ public class AVLTree<T> extends BinTree<T> {
 
     }
 
+    private void balance(Node<T> node) {
+        if(node == null) return;
+        if(Math.abs(getHeight(node.getRight()) - getHeight(node.getLeft())) == 2 ) {
+            checkRotationLeft(node);
+            checkRotationRight(node);
+            setHeight(node, depth(node));
+        }
+    }
+
     @Override
     public boolean add(T o) {
-        if(o == null) return false;
+        if (o == null) return false;
 
-        if (root == null){
+        if (root == null) {
             root = new AVLNode<>(o, 0);
             size = 1;
             return true;
         }
-
-        return add(root,o);
+        return add(root, o);
     }
 
-    private boolean add(Node<T> node, T o){
+    private boolean add(Node<T> node, T o) {
 
-        if(comparator.compare(o, node.getObject()) == 0) return false ;
+        if (comparator.compare(o, node.getObject()) == 0) return false;
 
-        if(comparator.compare(o, node.getObject()) < 0){
-            if(!node.isHaveLeft()){
-               node.setLeft(new AVLNode<>(o, 0));
-               updateHeight(node);
-            }else{
+        if (comparator.compare(o, node.getObject()) < 0) {
+            if (!node.isHaveLeft()) {
+                node.setLeft(new AVLNode<>(o, 0));
+                updateHeight(node);
+                size ++;
+            } else {
                 add(node.getLeft(), o);
                 checkRotationRight(node);
             }
-        }else{
-            if(!node.isHaveRight()){
-                node.setRight(new AVLNode<>(o,0));
+        } else {
+            if (!node.isHaveRight()) {
+                node.setRight(new AVLNode<>(o, 0));
                 updateHeight(node);
-            }else{
+                size++;
+            } else {
                 add(node.getRight(), o);
                 checkRotationLeft(node);
             }
         }
-        size++;
         return true;
     }
 
     @Override
     public boolean remove(T o) {
-        System.out.println("Ups =) ");
-        return false;
+        AVLNode<T> deleted = (AVLNode<T>) getNode(o , root);
+        if(deleted == null) return false;
+        remove(deleted);
+
+        return true;
+    }
+
+    private void remove(Node<T> deletedNode) {
+
+        if(size == 1) {
+            clean();
+            return ;
+        }
+        if (!deletedNode.isHaveRight() && !deletedNode.isHaveLeft()) {
+            Node<T> n = deletedNode.getRoot();
+            deleteLeaf(deletedNode);
+            updateBalanceToRoot(n);
+
+        } else if (!deletedNode.isHaveLeft()) {
+             Node<T> n = swapAndDeleteNode(deletedNode, deletedNode.getRight());
+             updateBalanceToRoot(n);
+        } else if (!deletedNode.isHaveRight()) {
+            Node n = swapAndDeleteNode(deletedNode, deletedNode.getLeft());
+            updateBalanceToRoot(n);
+
+        } else {
+            AVLNode<T> minR = (AVLNode<T>) getSmallest(deletedNode.getRight());
+            AVLNode<T> newNode = new AVLNode<>(minR.getObject(), deletedNode.getLeft(),
+                    deletedNode.getRight(), deletedNode.getRoot(), -1 );
+            updateHeight(newNode);
+
+            swapAndDeleteNode(deletedNode, newNode);
+            remove(minR);
+            size++;
+        }
+        size --;
+        return;
+    }
+
+    private void deleteLeaf(Node<T> leaf){
+        Node<T> parent = leaf.getRoot();
+        parent.removeChild(leaf);
+        leaf.clean();
+    }
+
+    private Node<T> swapAndDeleteNode(Node<T> deleted, Node<T> newNode){
+        Node<T> parent = deleted.getRoot();
+        if(parent == null) {
+            this.root = newNode;
+            this.root.setRoot(null);
+            setHeight(root, depth(root));
+            return newNode;
+        }
+        newNode.setRoot(parent);
+        if(parent.getRight() == deleted)  parent.setRight(newNode);
+        else parent.setLeft(newNode);
+        deleted.clean();
+        return newNode;
+    }
+
+    private void updateBalanceToRoot(Node<T> n){
+        if(n == null) return;
+        while (n.isHaveRoot()){
+            balance(n);
+            n = n.getRoot();
+        }
+        balance(n);
     }
 
     @Override
@@ -207,11 +293,12 @@ public class AVLTree<T> extends BinTree<T> {
 
     @Override
     public AVLTree<T> copy() {
-       AVLTree avlTree = new AVLTree<>(comparator);
-       BinTree binCopy = super.copy();
+       AVLTree<T> avlTree = new AVLTree<>(comparator);
+       BinTree<T> binCopy = super.copy();
        avlTree.root = binCopy.root;
        avlTree.size = binCopy.size;
        avlTree.initAllHeight();
+       binCopy.clean();
        return avlTree;
     }
 }

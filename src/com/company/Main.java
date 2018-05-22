@@ -2,14 +2,12 @@ package com.company;
 
 import com.company.tree.*;
 
-import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class Main {
 
     public static void main(String[] args) {
-        SimpleTree<Integer> tree = new SimpleTree<>(Integer::compareTo);
+        SimpleBinTree<Integer> tree = new SimpleBinTree<>(Integer::compareTo);
         ArrayList<Integer> list = new ArrayList<>();
         TreeTraversal treeTraversal = TreeTraversal.Postorder;
 
@@ -34,7 +32,7 @@ public class Main {
             tree.addAll(list);
 
             TreeNode<Integer>[] nodes = tree.getNodeArrWithDepth(treeTraversal);
-            BinTree<Integer> copy = new SimpleTree<>(Integer::compareTo);
+            BinTree<Integer> copy = new SimpleBinTree<>(Integer::compareTo);
             copy.fillFromArr(nodes, treeTraversal);
 
             if(!copy.toString(treeTraversal).equals(tree.toString(treeTraversal))){

@@ -101,9 +101,38 @@ public class AVLMain {
 
         };
 
+
+
         testRotL.fillFromArr(exampleRotLeft, TreeTraversal.Inorder);
         testRotR.fillFromArr(exampleRotRight, TreeTraversal.Inorder);
         test.fillFromArr(avlExample, TreeTraversal.Inorder);
+
+        testRotL.print();
+
+        testRotL.remove(25);
+        testRotL.print();
+
+        test.clean();
+        System.out.println();
+        Integer[] integers = new Integer[]{7,12,15,18,23,27,34};
+        for (Integer integer : integers) {
+            System.out.println("add: "+ integer);
+            test.add(integer);
+            test.print();
+            System.out.println("----------");
+        }
+        System.out.println("\n\n");
+
+        test.print();
+        System.out.println();
+
+        for (int i = integers.length - 1; i >= 0; i--) {
+            System.out.println("remove: "+ integers[i]);
+            test.remove(integers[i]);
+            test.print();
+            System.out.println("--------------------");
+
+        }
 
 
 
