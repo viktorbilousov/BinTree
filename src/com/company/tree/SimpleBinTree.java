@@ -2,9 +2,9 @@ package com.company.tree;
 
 import java.util.Comparator;
 
-public class SimpleTree<T> extends BinTree<T> {
+public class SimpleBinTree<T> extends BinTree<T> {
 
-    public SimpleTree(Comparator<T> comparator) {
+    public SimpleBinTree(Comparator<T> comparator) {
         super(comparator);
     }
 
@@ -58,7 +58,6 @@ public class SimpleTree<T> extends BinTree<T> {
             clean();
             return true;
         }
-
         if (!deletedNode.isHaveRight() && !deletedNode.isHaveLeft()) {
             deleteLeaf(deletedNode);
         } else if (!deletedNode.isHaveLeft()) {
@@ -102,7 +101,4 @@ public class SimpleTree<T> extends BinTree<T> {
     private int compareNode(Node<T> n1, Node<T> n2){
         return comparator.compare(n1.getObject(),n2.getObject());
     }
-
-
-
 }
