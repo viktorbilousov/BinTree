@@ -8,42 +8,26 @@ public class Main {
 
     public static void main(String[] args) {
         SimpleBinTree<Integer> tree = new SimpleBinTree<>(Integer::compareTo);
-        ArrayList<Integer> list = new ArrayList<>();
-        TreeTraversal treeTraversal = TreeTraversal.Postorder;
+        SimpleBinTree<Integer> newTree = new SimpleBinTree<>(Integer::compareTo);
 
-        Integer[] integer = new Integer[] {0, 4, 8, 9, 8, 4, 5, 1, -10, 3};
-
-        for (Integer integer1 : integer) {
-            tree.add(integer1);
+        Random r = new Random();
+        for(int i =0 ; i< 10 ; i++){
+            if(!tree.add(r.nextInt(100))) i--;
         }
 
-        tree.print(treeTraversal);
-        TreeNode<Integer>[] integerTreeNode = tree.getNodeArrWithDepth(treeTraversal);
-        System.out.println(Arrays.toString(integerTreeNode));
+        System.out.printf("Tree:\t\t");
+        tree.print(TreeTraversal.Inorder);
 
-        for (int j = 0; j < 100; j++) {
+        TreeNode[] pos = tree.getNodeArrWithDepth(TreeTraversal.Postorder);
+        TreeNode[] ino = tree.getNodeArrWithDepth(TreeTraversal.Inorder);
 
-            tree.clean();
-            Random r = new Random();
-            for (int i = 0; i < 100; i++) {
-                list.add(r.nextInt(20) - 10);
-            }
+        newTree.fillFromInoUndPos(ino, pos);
+        System.out.printf("New Tree:\t");
+        newTree.print(TreeTraversal.Inorder);
+        System.out.println("isEquals=" + newTree.equals(tree));
 
-            tree.addAll(list);
 
-            TreeNode<Integer>[] nodes = tree.getNodeArrWithDepth(treeTraversal);
-            BinTree<Integer> copy = new SimpleBinTree<>(Integer::compareTo);
-            copy.fillFromArr(nodes, treeTraversal);
 
-            if(!copy.toString(treeTraversal).equals(tree.toString(treeTraversal))){
-                tree.print(treeTraversal);
-                System.out.println(Arrays.toString(nodes));
-                list.forEach(o -> System.out.printf(o + ", "));
-                System.out.println();
-                copy.print(treeTraversal);
-                break;
-            }else System.out.println("ok "+j );
 
-        }
     }
 }

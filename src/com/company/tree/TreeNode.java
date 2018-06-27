@@ -25,6 +25,10 @@ public class TreeNode<T> {
         this.depth = depth;
     }
 
+    public boolean containEmptyObj(){
+        return obj == null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

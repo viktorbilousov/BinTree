@@ -15,7 +15,7 @@ public class SimpleBinTree<T> extends BinTree<T> {
             return true;
         }
 
-        Node<T> pointer = root;
+        Node<T> pointer = (Node<T>) root;
         Node<T> newPoint = new Node<T>(o);
         while (true){
             int compare = compareNode(pointer, newPoint);
@@ -44,14 +44,14 @@ public class SimpleBinTree<T> extends BinTree<T> {
     }
 
     public boolean remove(T o) {
-        return remove(o ,this.root);
+        return remove(o, this.root);
     }
 
-    private boolean remove(T o, Node<T> root) {
+    private boolean remove(T o, BinNode<T> root) {
 
         if(size == 0) return false;
 
-        Node<T> deletedNode = getNode(o, root);
+        Node<T> deletedNode = (Node<T>) getNode(o, root);
         if (deletedNode == null) return false;
 
         if(size == 1) {

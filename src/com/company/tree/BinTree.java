@@ -1,120 +1,12 @@
 package com.company.tree;
 
-import com.company.printer.ConsolePrinter;
+import com.company.tools.ConsolePrinter;
 
 import java.util.*;
 
-public abstract class BinTree<T> implements iTree<T>{
+public abstract class BinTree<T> implements Tree<T> {
 
-    protected class Node<T>{
-        private Node<T> left;
-        private Node<T> right;
-        private Node<T> root = null;
-        private T object;
-
-        public T getObject() {
-            return object;
-        }
-
-        public Node<T> getLeft() {
-            return left;
-        }
-
-        public Node<T> getRight() {
-            return right;
-        }
-
-        public void setLeft(Node<T> left) {
-            this.left = left;
-            if(left != null) this.left.setRoot(this);
-        }
-
-        public void setObject(T object) {
-            this.object = object;
-        }
-
-        public void setRight(Node<T> right) {
-            this.right = right;
-            if(right != null) this.right.setRoot(this);
-        }
-
-        public Node<T> getRoot() {
-            return root;
-        }
-
-        public void setRoot(Node<T> root) {
-            this.root = root;
-        }
-
-        public Node(T object, Node<T> left, Node<T> right) {
-            setLeft(left);
-            setRight(right);
-            this.object = object;
-            this.root = null;
-        }
-
-        public Node(T object, Node<T> left, Node<T> right, Node<T> root) {
-            setLeft(left);
-            setRight(right);
-            this.root = root;
-            this.object = object;
-        }
-
-        public Node(T object) {
-            this.object = object;
-            right = null;
-            left = null;
-            root = null;
-        }
-
-        public void clean(){
-            left = null;
-            right = null;
-            object = null;
-            root = null;
-        }
-
-        public boolean isHaveLeft(){
-            return left != null;
-        }
-
-        public boolean isHaveRight(){
-            return right != null;
-        }
-
-        public boolean isHaveRoot(){
-            return root != null;
-        }
-
-        public boolean removeChild(Node<T> child){
-            if(child == left) {
-                left = null;
-                return true;
-            }
-            else if (child == right){
-                right = null;
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            try {
-                T _obj = (T) obj;
-            }catch (Exception e){
-                return false;
-            }
-            return  obj.equals(object);
-        }
-
-        @Override
-        public String toString() {
-            return object.toString();
-        }
-    }
-
-    Node<T> root = null;
+    protected BinNode<T> root = null;
     protected int size = 0;
     protected final Comparator<T> comparator;
 
@@ -139,9 +31,30 @@ public abstract class BinTree<T> implements iTree<T>{
         return res;
     }
 
+
+    @Override
+    final public boolean removeAll(Collection<T> c) {
+        if(c.size() == 0) return false;
+        for (T t : c) {
+            remove(t);
+        }
+        return true;
+    }
+
     @Override
     final public int size() {
         return size;
+    }
+
+    @Override
+    final public boolean isEmpty(){
+        return size == 0;
+    }
+
+    @Override
+    public void clean(){
+        root = null;
+        size = 0;
     }
 
     @Override
@@ -154,32 +67,64 @@ public abstract class BinTree<T> implements iTree<T>{
         return culcDepthRec(node, -1);
     }
 
-    private int culcDepthRec(Node root, int depth){
+    private int culcDepthRec(BinNode root, int depth){
         if(root == null) return depth;
-        int dl = culcDepthRec(root.right, depth +1);
-        int dr = culcDepthRec(root.left, depth+1);
+        int dl = culcDepthRec(root.getRight(), depth +1);
+        int dr = culcDepthRec(root.getLeft(), depth+1);
         return dl > dr ? dl : dr;
     }
 
-    @Override
-    final public boolean remove(Collection<T> c) {
-        if(c.size() == 0) return false;
-        for (T t : c) {
-            remove(t);
-        }
-        return true;
-    }
 
     @Override
     final public boolean isContain(T o) {
         return  getNode(o, root) != null;
     }
 
-    @Override
     final public T binSearch(T o) {
         return getNode(o,root).getObject();
     }
 
+
+    public boolean equals(Tree obj) {
+        return this.toString().equals(obj.toString());
+    }
+
+    public TreeNode<T>[] getNodeArrWithDepth(TreeTraversal treeTraversal) {
+        ArrayList<TreeNode> list = new ArrayList<>(); // Teta(1)
+        fillList(list, root, 0, treeTraversal); // Teta(N)
+        return list.toArray(new TreeNode[0]); // Teta(N)
+        //sum = teta(1) + Teta(N) + Teta(N) = 2*teta(N) + 1 = Teta(N)
+    }
+
+    private void fillList(ArrayList<TreeNode> list, BinNode<T> root, int depth, TreeTraversal t) {
+        if (root != null) {
+            switch (t) {
+                case Postorder: {
+                    fillList(list, root.getLeft(), depth + 1, t);
+                    fillList(list, root.getRight(), depth + 1, t);
+                    list.add( new TreeNode<>(root.getObject(), depth) );
+                    break;
+                }
+                case Preorder: {
+                    list.add(new TreeNode<>(root.getObject(), depth));
+                    fillList(list, root.getLeft(), depth + 1, t);
+                    fillList(list, root.getRight(), depth + 1, t);
+                    break;
+                }
+                case Inorder: {
+                    fillList(list, root.getLeft(), depth + 1, t);
+                    list.add(new TreeNode<>(root.getObject(), depth));
+                    fillList(list, root.getRight(), depth + 1, t);
+                    break;
+                }
+            }
+        }else{
+            list.add(new TreeNode<>(null, depth));
+        }
+    }
+
+
+    //region print() and toString()
     @Override
     final public void print(){
         print(DEF_TRAV);
@@ -201,9 +146,9 @@ public abstract class BinTree<T> implements iTree<T>{
                 line = printer.formatText(line, rootFormat, line.lastIndexOf(',') + 1, line.length() - 1);
                 break;
             case Inorder: {
-                String rootObjStr = root.getObject().toString();
+                String rootObjStr = ","+root.getObject().toString()+",";
                 int index = line.indexOf(rootObjStr);
-                line = printer.formatText(line, rootFormat, index, rootObjStr.length() + index);
+                line = printer.formatText(line, rootFormat, index +1, rootObjStr.length() + index -1);
                 break;
             }
         }
@@ -233,33 +178,33 @@ public abstract class BinTree<T> implements iTree<T>{
     @Override
     final public String toString(TreeTraversal treeTraversal) {
         if(root == null) return "(null)";
-        return getStr(root, null, treeTraversal, 0);
+        return getStr(root, null, treeTraversal);
     }
 
-    private String getStr(Node<T> root, String line, TreeTraversal t, int depth) {
+    private String getStr(BinNode<T> root, String line, TreeTraversal t) {
         if(line == null) line = "";
         if (root!= null) {
 
             switch (t) {
                 case Inorder: {
                     line += "(";
-                    line = getStr(root.left, line, t, depth+1) +",";
+                    line = getStr(root.getLeft(), line, t) +",";
                     line += root + ",";
-                    line = getStr(root.right, line,t, depth+1);
+                    line = getStr(root.getRight(), line,t);
                     line += ")";
                     break;
                 }case Postorder:{
                     line += "(";
-                    line = getStr(root.left, line,t, depth+1) + ",";
-                    line = getStr(root.right, line,t, depth+1) + ",";
+                    line = getStr(root.getLeft(), line,t) + ",";
+                    line = getStr(root.getRight(), line,t) + ",";
                     line += root;
                     line += ")";
                     break;
                 }case Preorder:{
                     line +=  "(";
                     line += root + ",";
-                    line = getStr(root.left, line,t , depth+1) + ",";
-                    line = getStr(root.right, line,t, depth+1) ;
+                    line = getStr(root.getLeft(), line,t) + ",";
+                    line = getStr(root.getRight(), line,t) ;
                     line += ")";
                     break;
                 }
@@ -270,25 +215,7 @@ public abstract class BinTree<T> implements iTree<T>{
 
         return line;
     }
-
-    @Override
-    public void clean(){
-        root = null;
-        size = 0;
-    }
-
-    public boolean equals(iTree obj) {
-        return this.toString().equals(obj.toString());
-    }
-
-    public TreeNode<T>[] getNodeArrWithDepth(TreeTraversal treeTraversal) {
-
-        ArrayList<TreeNode> list = new ArrayList<>();
-        fillList(list, root, 0, treeTraversal);
-        TreeNode[] treeNodes = new TreeNode[list.size()];
-        treeNodes = list.toArray(treeNodes);
-        return treeNodes;
-    }
+    //endregion
 
     //region tree presentation
 
@@ -413,51 +340,68 @@ public abstract class BinTree<T> implements iTree<T>{
 
     }
 
-//endregion
 
-    //todo copy
-    @Override
-    public BinTree<T> copy() {
-        BinTree<T> copy = new SimpleBinTree<>(comparator);
-        if(root == null) return copy;
-        copy.root = new Node<>(root.getObject());
-        recCopy(this.root, copy.root);
-        copy.size = this.size;
-        return copy;
-    }
-    private void recCopy(Node<T> thisRoot, Node<T> copyRoot){
-        if(thisRoot == null) return;
+    //endregion
 
-        if(thisRoot.isHaveLeft()){
-            copyRoot.setLeft(new Node<>(thisRoot.getLeft().getObject()));
-            recCopy(thisRoot.getLeft(), copyRoot.getLeft());
+
+    private Node<T> getNodeRec(T o, Node<T> root){
+        int compare = comparator.compare(o, root.getObject());
+        if(compare == 0) return root;
+
+        if(compare == -1 && root.isHaveLeft()) {
+            return getNodeRec(o, root.getLeft());
+        }else if(compare == 1 && root.isHaveRight()){
+            return getNodeRec(o, root.getRight());
         }
-        if(thisRoot.isHaveRight()){
-            copyRoot.setRight(new Node<>(thisRoot.getRight().getObject()));
-            recCopy(thisRoot.getRight(), copyRoot.right);
-        }
+
+        return null;
     }
 
-    protected final Node<T> getNode(T o, Node<T> root){
+    protected final BinNode<T> getNode(T o, BinNode<T> root){
 
-        Node<T> pointer = root;
-        while (!pointer.object.equals(o)){
-            if(comparator.compare(pointer.object,o) > 0){
+        BinNode<T> pointer = root;
+        while (!pointer.getObject().equals(o)){
+            if(comparator.compare(pointer.getObject(),o) > 0){
                 if(pointer.isHaveLeft()) {
                     pointer = pointer.getLeft();
                 }else {
                     return null;
                 }
-            }else{
+            }else if(comparator.compare(pointer.getObject(),o) < 0){
                 if(pointer.isHaveRight()){
                     pointer = pointer.getRight();
                 }else{
                     return null;
                 }
+            }else{
+
+                if(pointer.isHaveLeft() && pointer.isHaveRight()){
+                    if(     comparator.compare(pointer.getRight().getObject(),o) == 0
+                            &&  comparator.compare(pointer.getLeft().getObject(),o) == 0
+                            ){
+                        BinNode<T> res = getNode(o, pointer.getLeft());
+                        if( res == null)  res = getNode(o, pointer.getRight());
+                        return res;
+                    }
+                }
+
+                if(pointer.isHaveRight()){
+                    if(comparator.compare(pointer.getRight().getObject(),o) == 0){
+                        pointer = pointer.getRight();
+                        continue;
+                    }
+                }if(pointer.isHaveLeft()) {
+                    if (comparator.compare(pointer.getLeft().getObject(), o) == 0) {
+                        pointer = pointer.getLeft();
+                        continue;
+                    }
+                }
+                return null;
             }
         }
         return pointer;
     }
+
     protected final Node<T> getSmallest(Node<T> root){
         Node<T> pointer = root;
         while (pointer.isHaveLeft()) pointer = pointer.getLeft();
@@ -467,33 +411,6 @@ public abstract class BinTree<T> implements iTree<T>{
         Node<T> pointer = root;
         while (pointer.isHaveRight()) pointer = pointer.getRight();
         return pointer;
-    }
-
-    private void fillList(ArrayList<TreeNode> list, Node<T> root, int depth, TreeTraversal t) {
-        if (root != null) {
-            switch (t) {
-                case Postorder: {
-                    fillList(list, root.left, depth + 1, t);
-                    fillList(list, root.right, depth + 1, t);
-                    list.add( new TreeNode<>(root.object, depth) );
-                    break;
-                }
-                case Preorder: {
-                    list.add(new TreeNode<>(root.object, depth));
-                    fillList(list, root.left, depth + 1, t);
-                    fillList(list, root.right, depth + 1, t);
-                    break;
-                }
-                case Inorder: {
-                    fillList(list, root.left, depth + 1, t);
-                    list.add(new TreeNode<>(root.object, depth));
-                    fillList(list, root.right, depth + 1, t);
-                    break;
-                }
-            }
-        }else{
-            list.add(new TreeNode<>(null, depth));
-        }
     }
 
 }
