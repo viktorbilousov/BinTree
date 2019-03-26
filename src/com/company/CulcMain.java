@@ -4,6 +4,9 @@ import com.company.calculator.Calculator;
 import com.company.calculator.exceptions.FunctionException;
 
 public class CulcMain {
+    /**
+     * Calculator used Bin-tree
+     */
     public static void main(String[] args) {
         Calculator calculator = new Calculator();
 

@@ -6,6 +6,11 @@ import java.util.*;
 
 public class Main {
 
+
+    /**
+     * tree generation and copying
+     */
+
     public static void main(String[] args) {
 
         SimpleBinTree<Integer> tree =       new SimpleBinTree<>(Integer::compareTo);
@@ -28,16 +33,6 @@ public class Main {
         newTree.print(TreeTraversal.Inorder);
         System.out.println("isEquals=" + newTree.equals(tree));
 
-
-
-
-/*    SimpleBinTree<Integer> tree = new SimpleBinTree<>(Integer::compareTo);
-    Integer[] integers = new Integer[]{15,5,3,12,13,10,6,7,16,20,18,23};
-        for (Integer integer : integers) {
-            tree.add(integer);
-        }
-       // tree.print(TreeTraversal.Postorder);
-        System.out.println(Arrays.toString(tree.toArray(TreeTraversal.Inorder)));*/
 
 
     }

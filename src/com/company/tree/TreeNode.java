@@ -1,5 +1,8 @@
 package com.company.tree;
 
+
+// simplified version of Node for Output
+
 public class TreeNode<T> {
     private T obj;
     private int depth;
@@ -44,7 +47,6 @@ public class TreeNode<T> {
     public String toString() {
 
         if(obj == null) return  "null="+depth;
-
         return obj.toString() +"="+depth;
     }
 }
