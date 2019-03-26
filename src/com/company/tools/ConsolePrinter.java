@@ -1,11 +1,18 @@
-package com.company.printer;
+package com.company.tools;
 
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сonsole color output
+ */
 public  class ConsolePrinter {
 
+
+    /**
+     * Format - a character before some text that describes the color and style of the text to out in the console
+     */
     public enum Format {
 
         // Reset
@@ -204,22 +211,41 @@ public  class ConsolePrinter {
         line += " ";
         System.out.println(formatString(line));
     }
-
     public void printf(String line){
         line += " ";
         System.out.printf(formatString(line));
     }
 
+
+    /**
+     * returns formatted all text
+     * @param s - sourse text
+     * @param format - text format (style + color)
+     */
     public String formatText(String s, Format format){
         if(format == null) return s;
         return format + s + Format.Reset;
     }
 
+    /**
+     *returns formatted text within the specified range
+     * @param s - source text
+     * @param format - text format (style + color)
+     * @param from - start index
+     * @param to - end index
+     * @return
+     */
     public String formatText(String s, Format format, int from, int to){
         if(format == null) return s;
         return s.substring(0, from) + format + s.substring(from, to) + Format.Reset + s.substring(to, s.length());
     }
 
+
+    /**
+     * recognizes HTML style and color tags and applies them to text
+     * @param line
+     * @return formatted text
+     */
     private String formatString(String line)  {
 
         String newLine = "";
@@ -232,8 +258,7 @@ public  class ConsolePrinter {
 
         while(indexF != lastIndexF && indexL != lastIndexL) {
 
-
-            String[] tokens = new String[]{"",""};
+            String[] tags = new String[]{"",""}; // found tags for recognition
 
             for (int i = 0; i < 2; i++) { // <first><second> or <first>
                 indexF = line.indexOf("<", indexF + 1);
@@ -246,24 +271,24 @@ public  class ConsolePrinter {
                     indexL = line.indexOf(">", indexL + 1);
                 }
 
-                tokens[i] = line.substring(indexF, indexL + 1);
+                tags[i] = line.substring(indexF, indexL + 1);
 
                 // expl error <token>text text text <= text<token>
-                while (tokens[i].indexOf("<") != tokens[i].lastIndexOf("<")){
-                    String dif = tokens[i].substring(0,tokens[i].lastIndexOf("<"));
+                while (tags[i].indexOf("<") != tags[i].lastIndexOf("<")){
+                    String dif = tags[i].substring(0,tags[i].lastIndexOf("<"));
                     indexF += dif.length();
                     newLine += dif;
-                    tokens[i] = tokens[i].substring(tokens[i].lastIndexOf("<"), tokens[i].length());
+                    tags[i] = tags[i].substring(tags[i].lastIndexOf("<"), tags[i].length());
                 }
 
                if (line.charAt(indexL + 1) != '<') break;
 
             }
 
-            Format format = recogniseFormat(tokens);
+            Format format = recogniseFormat(tags);
 
             if (format == null){
-                for (String s : tokens) {
+                for (String s : tags) {
                     newLine += s;
                 }
                 continue;
@@ -272,12 +297,17 @@ public  class ConsolePrinter {
             newLine += getCorrectTokens(format, stack);
 
         }
+
         if(indexL != line.length()-1) {
             newLine += line.substring(indexL + 1, line.length());
         }
         return newLine + Format.Reset;
     }
 
+    /**
+     * converting tokens to Format
+     * @param tokens (exmpl. "<i><u>" - underline + high intensty,  "<r><b>" - red + bold)
+     */
     private Format recogniseFormat(String[] tokens){
         Format.Color color = null;
         Format.Style style = null;
@@ -294,6 +324,12 @@ public  class ConsolePrinter {
         return Format.getFormat(color,style);
     }
 
+    /**
+     * checks for the need to use a closing tag (token).
+     * @param format checked format
+     * @param stack stack of used formats in text
+     * @return correct Token
+     */
     private String getCorrectTokens(Format format, ArrayList<Format> stack){
 
         String tokens = "";
@@ -310,10 +346,10 @@ public  class ConsolePrinter {
                tokens = format.toString();
            }
 
-           else if(s == null){
+           else if(s == null){  // if the "format" contains only color -> search this color in stack
                boolean isFoundColor = false;
                for (int i = stack.size() - 1; i >= 0; i--) {
-                   if(stack.get(i).color.equals(c)){
+                   if(stack.get(i).color.equals(c)){ // if found -> need close(reset) token + remove color from stack
                        s = stack.get(i).style;
                        tokens += stack.get(i) + "" +Format.getFormat(null, s);
                        stack.remove(stack.get(i));
@@ -323,14 +359,14 @@ public  class ConsolePrinter {
                    }
                }
 
-               if(!isFoundColor){
+               if(!isFoundColor){ // if not found ->  change last format ( change color )
                    Format f = stack.get(stack.size()-1);
                    stack.remove(f);
                    stack.add(Format.getFormat(c, f.style));
                    tokens  += f + "" + Format.getFormat(c, f.style);
                }
            }
-           else{
+           else{   // change last format ( change color )
                Format f = stack.get(stack.size()-1);
                stack.remove(f);
                stack.add(Format.getFormat(c, f.style));
@@ -341,6 +377,8 @@ public  class ConsolePrinter {
 
         return tokens;
     }
+
+
 
     public String formatList(List list, String selectionWord, int from, int to ) {
 
@@ -427,50 +465,5 @@ public  class ConsolePrinter {
         return false;
     }
 
-    public String getTree(int lvl){
-        return getTree(lvl, 5,4);
-    }
-    public String getTree(int lvl, int spaceLength, int arrowLength){
-        if(lvl == 0 ) {
-            return "->";
-        }
-        String out = "";
-        String jumpWord ="|";
-        String arrow = "|";
-        for (int i = 0; i < spaceLength; i++) jumpWord += " ";
-        for (int i = 0; i < arrowLength; i++) arrow += "-";
-        arrow += ">";
-        out += " "; // arrow from lvl 0
-        for (int i = 0; i < lvl-1; i++) {
-            out += jumpWord;
-        }
-        out += arrow;
-        return out;
-    }
-
-    public void printTree(int lvl){
-        System.out.printf(getTree(lvl));
-    }
-    public void printTree(int lvl, int spaceLength, int arrowLength){
-        System.out.printf(getTree(lvl, spaceLength, arrowLength));
-    }
-
-    public void printSpace(int cnt){
-        System.out.printf(getSpace(cnt));
-    }
-    public String getSpace(int cnt){
-        String line = "";
-        for (int i = 0; i < cnt; i++) {
-            line += " ";
-        }
-        return line;
-    }
-
-    public String clearAll(String line){
-        for (Format format : Format.values()) {
-            line = line.replace(format.toString(), "");
-        }
-        return line;
-    }
 
 }

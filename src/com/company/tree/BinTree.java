@@ -31,7 +31,6 @@ public abstract class BinTree<T> implements Tree<T> {
         return res;
     }
 
-
     @Override
     final public boolean removeAll(Collection<T> c) {
         if(c.size() == 0) return false;
@@ -138,6 +137,8 @@ public abstract class BinTree<T> implements Tree<T> {
         }
 
         final ConsolePrinter.Format rootFormat = ConsolePrinter.Format.URed;
+
+        // painting tree`s root
         switch (treeTraversal) {
             case Preorder:
                 line = printer.formatText(line, rootFormat, 1, line.indexOf(','));
@@ -146,6 +147,7 @@ public abstract class BinTree<T> implements Tree<T> {
                 line = printer.formatText(line, rootFormat, line.lastIndexOf(',') + 1, line.length() - 1);
                 break;
             case Inorder: {
+
                 String rootObjStr = ","+root.getObject().toString()+",";
                 int index = line.indexOf(rootObjStr);
                 line = printer.formatText(line, rootFormat, index +1, rootObjStr.length() + index -1);
@@ -155,6 +157,7 @@ public abstract class BinTree<T> implements Tree<T> {
 
         int cnt = 0;
 
+        // painting brackets with different color
         for (int i = 0; i < line.length(); i++) {
             if (line.charAt(i) == '(') {
                 cnt++;
@@ -411,6 +414,19 @@ public abstract class BinTree<T> implements Tree<T> {
         Node<T> pointer = root;
         while (pointer.isHaveRight()) pointer = pointer.getRight();
         return pointer;
+    }
+
+    public final T[] toArray(TreeTraversal t){
+        TreeNode<T>[] n = getNodeArrWithDepth(t);
+        T[] arr = (T[])new Object[size];
+        int i =0;
+        for (TreeNode<T> node : n) {
+            if(node.getObj() != null){
+                arr[i] = node.getObj();
+                i++;
+            }
+        }
+        return arr;
     }
 
 }

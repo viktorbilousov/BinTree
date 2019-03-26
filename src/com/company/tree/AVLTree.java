@@ -214,7 +214,6 @@ public class AVLTree<T> extends BinTree<T> {
         return true;
     }
 
-
     private void remove(Node<T> deletedNode) {
 
         if(size == 1) {
@@ -309,7 +308,6 @@ public class AVLTree<T> extends BinTree<T> {
         }
         return avlNode;
     }
-
 
 
     //region wrappers
