@@ -1,8 +1,6 @@
-package com.company.calculator;
+package com.company.example.calculator;
 
-import com.company.calculator.exceptions.FunctionException;
-
-import java.util.Arrays;
+import com.company.example.calculator.exceptions.FunctionException;
 
 public class Calculator {
 

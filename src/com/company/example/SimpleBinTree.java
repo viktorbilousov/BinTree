@@ -1,4 +1,8 @@
-package com.company.tree;
+package com.company.example;
+
+import com.company.tree.BinNode;
+import com.company.tree.BinTree;
+import com.company.tree.Node;
 
 import java.util.Comparator;
 
@@ -43,10 +47,6 @@ public class SimpleBinTree<T> extends BinTree<T> {
         return true;
     }
 
-    public boolean remove(T o) {
-        return remove(o, this.root);
-    }
-
     private boolean remove(T o, BinNode<T> root) {
 
         if(size == 0) return false;
@@ -76,6 +76,10 @@ public class SimpleBinTree<T> extends BinTree<T> {
         }
         size --;
         return true;
+    }
+
+    public boolean remove(T o) {
+        return remove(o, this.root);
     }
 
     private void deleteLeaf(Node<T> leaf){

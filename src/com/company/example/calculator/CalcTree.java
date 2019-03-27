@@ -1,4 +1,4 @@
-package com.company.calculator;
+package com.company.example.calculator;
 
 import com.company.tree.BinNode;
 import com.company.tree.BinTree;

@@ -1,4 +1,4 @@
-package com.company.calculator;
+package com.company.example.calculator;
 
 class Operator {
     private char key;

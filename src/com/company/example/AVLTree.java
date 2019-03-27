@@ -1,4 +1,9 @@
-package com.company.tree;
+package com.company.example;
+
+import com.company.tree.BinTree;
+import com.company.tree.Node;
+import com.company.tree.TreeNode;
+import com.company.tree.TreeTraversal;
 
 import java.util.Comparator;
 
@@ -65,7 +70,7 @@ public class AVLTree<T> extends BinTree<T> {
     private int  getHeight(Node<T> node) {
         return (node == null) ? -1 : ((AVLNode<T>) node).getHeight();
     }
-    private void    setHeight(Node<T> node, int height) {
+    private void  setHeight(Node<T> node, int height) {
         ((AVLNode) node).setHeight(height);
     }
 
@@ -211,7 +216,7 @@ public class AVLTree<T> extends BinTree<T> {
         return true;
     }
 
-    private void remove(Node<T> deletedNode) {
+    private void    remove(Node<T> deletedNode) {
 
         if(size == 1) {
             clean();
@@ -243,7 +248,7 @@ public class AVLTree<T> extends BinTree<T> {
         return;
     }
 
-    private void deleteLeaf(Node<T> leaf){
+    private void    deleteLeaf(Node<T> leaf){
         Node<T> parent = leaf.getRoot();
         parent.removeChild(leaf);
         leaf.clean();

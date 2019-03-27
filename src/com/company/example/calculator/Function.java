@@ -1,6 +1,6 @@
-package com.company.calculator;
+package com.company.example.calculator;
 
-import com.company.calculator.exceptions.FunctionException;
+import com.company.example.calculator.exceptions.FunctionException;
 
 public class Function {
     private String key;
