@@ -1,12 +1,8 @@
 package com.company;
 
 import com.company.tools.ArrayGenerator;
-import com.company.tree.AVLTree;
-import com.company.tree.Tree;
-import com.company.tree.TreeNode;
-import com.company.tree.TreeTraversal;
+import com.company.example.AVLTree;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 public class AVLMain {

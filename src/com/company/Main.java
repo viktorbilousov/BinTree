@@ -1,5 +1,6 @@
 package com.company;
 
+import com.company.example.SimpleBinTree;
 import com.company.tree.*;
 
 import java.util.*;

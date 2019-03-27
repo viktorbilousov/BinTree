@@ -1,7 +1,7 @@
 package com.company;
 
-import com.company.calculator.Calculator;
-import com.company.calculator.exceptions.FunctionException;
+import com.company.example.calculator.Calculator;
+import com.company.example.calculator.exceptions.FunctionException;
 
 public class CulcMain {
     /**
